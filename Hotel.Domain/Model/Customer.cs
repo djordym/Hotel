@@ -9,38 +9,45 @@ namespace Hotel.Domain.Model
 {
     public class Customer
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public ContactInfo Contact { get; set; }
-        private List<Member> _members = new List<Member>(); //gn dubbels
+        private string _name;
+        public string Name { get { return _name; } set { if (string.IsNullOrWhiteSpace(value)) throw new CustomerException("name is empty"); _name = value; } }
+        private int _id;
+        public int Id { get { return _id; } set { if (value <= 0) throw new CustomerException("invalid id"); _id = value; } }
+        private ContactInfo _contactInfo;
+        public ContactInfo ContactInfo { get { return _contactInfo; } set { if (value == null) throw new CustomerException("contactinfo null"); _contactInfo = value; } }
+        private List<Member> _members = new List<Member>();
 
-        public Customer(int id, string name, ContactInfo contact)
+        public Customer(string name, int id, ContactInfo contactInfo)
         {
-            Id = id;
-            Name = name;
-            Contact = contact;
+            _name = name;
+            _id = id;
+            _contactInfo = contactInfo;
         }
 
-        public Customer(string name, ContactInfo contact)
+        public Customer(string name, ContactInfo contactInfo)
         {
-            Name = name;
-            Contact = contact;
+            _name = name;
+            _contactInfo = contactInfo;
         }
 
-        public IReadOnlyList<Member> GetMembers() { return _members.AsReadOnly(); }
+        public IReadOnlyList<Member> GetMembers()
+        {
+            return _members.AsReadOnly();
+        }
         public void AddMember(Member member)
         {
             if (!_members.Contains(member))
                 _members.Add(member);
             else
-                throw new CustomerException("AddMember");
+                throw new CustomerException("addmember");
         }
-        public void RemoveMember(Member member) 
+        public void RemoveMember(Member member)
         {
             if (_members.Contains(member))
                 _members.Remove(member);
             else
-                throw new CustomerException("RemoveMember");
+                throw new CustomerException("removemember");
         }
     }
 }
+

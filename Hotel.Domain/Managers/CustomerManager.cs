@@ -18,15 +18,15 @@ namespace Hotel.Domain.Managers
             _customerRepository = customerRepository;
         }
 
-        public IReadOnlyList<Customer> GetCustomers(string filter)
+        public IReadOnlyList<Customer> GetCustomersBy(string? filter)
         {
             try
             {
-                return _customerRepository.GetCustomers(filter);
+                return _customerRepository.GetCustomersBy(filter);
             }
             catch(Exception ex)
             {
-                throw new CustomerManagerException("GetCustomers");
+                throw new CustomerManagerException("GetCustomers", ex);
             }
         }
     }

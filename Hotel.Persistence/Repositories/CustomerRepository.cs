@@ -19,85 +19,94 @@ namespace Hotel.Persistence.Repositories
             this.connectionString = connectionString;
         }
 
-        public IReadOnlyList<Customer> GetCustomers(string filter)
+        public List<Customer> GetCustomersBy(string filter)
         {
             try
             {
-                Dictionary<int,Customer> customers = new Dictionary<int, Customer>();
-                string sql = "select t1.id,t1.name customername,t1.email,t1.phone,t1.address,t2.name membername,t2.birthday\r\nfrom customer t1 left join (select * from member where status=1) t2 on t1.id=t2.customerId\r\nwhere t1.status=1";
-                if (!string.IsNullOrWhiteSpace(filter)) 
+                Dictionary<int, Customer> customers = new Dictionary<int, Customer>();
+                string sql;
+                if (string.IsNullOrEmpty(filter))
                 {
-                    sql += " and (t1.id like @filter or t1.name like @filter or t1.email like @filter)";
+                    sql = "select t1.id,t1.email,t1.name customername,t1.address,t1.phone,t2.name membername,t2.birthday\r\nfrom customer t1 \r\nleft join (select * from member where status=1) t2 on t1.id=t2.customerId\r\nwhere t1.status=1";
                 }
-                using(SqlConnection conn = new SqlConnection(connectionString)) 
-                using(SqlCommand cmd = conn.CreateCommand()) 
-                { 
+                else
+                {
+                    sql = "select t1.id,t1.email,t1.name customername,t1.address,t1.phone,t2.name membername,t2.birthday\r\nfrom customer t1 \r\nleft join (select * from member where status=1) t2 on t1.id=t2.customerId\r\nwhere t1.status=1 and (t1.id like @filter or t1.name like @filter or t1.email like @filter)";
+                }
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
                     conn.Open();
                     cmd.CommandText = sql;
-                    if (!string.IsNullOrWhiteSpace(filter)) cmd.Parameters.AddWithValue("@filter",$"%{filter}%");
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
+                    cmd.Parameters.AddWithValue("@filter", $"%{filter}%");
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.HasRows)
                         while (reader.Read())
                         {
                             int id = Convert.ToInt32(reader["ID"]);
-                            if (!customers.ContainsKey(id))
+                            if (!customers.ContainsKey(id)) //member toevoegen
                             {
-                                Customer customer = new Customer(id, (string)reader["customername"], new ContactInfo((string)reader["email"], (string)reader["phone"], new Address((string)reader["address"])));
-                                customers.Add(id, customer);
+                                customers.Add(id, new Customer((string)reader["customername"], (int)reader["id"], new ContactInfo((string)reader["email"], (string)reader["phone"], new Address((string)reader["address"]))));
                             }
                             if (!reader.IsDBNull(reader.GetOrdinal("membername")))
                             {
-                                Member member = new Member((string)reader["membername"], DateOnly.FromDateTime((DateTime)reader["birthday"]));
-                                customers[id].AddMember(member);
+                                customers[id].AddMember(new Member((string)reader["membername"], DateOnly.FromDateTime((DateTime)reader["birthday"])));
                             }
                         }
-                    }
+                    return customers.Values.ToList();
                 }
-                return customers.Values.ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new CustomerRepositoryException("getcustomer", ex);
+                throw new CustomerRepositoryException("GetCustomer", ex);
             }
         }
         public void AddCustomer(Customer customer)
         {
             try
             {
-                string sql = "INSERT INTO Customer(name,email,phone,address,status) output INSERTED.ID VALUES(@name,@email,@phone,@address,@status)";
+                string SQL = "INSERT INTO Customer(name,email,phone,address,status) output INSERTED.ID VALUES(@name,@email,@phone,@address,@status) ";
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     conn.Open();
-                    SqlTransaction sqlTransaction = conn.BeginTransaction();
+                    SqlTransaction transaction = conn.BeginTransaction();
                     try
                     {
-                        cmd.Transaction = sqlTransaction;
-                        cmd.CommandText = sql;
+                        //write customer table
+                        cmd.CommandText = SQL;
+                        cmd.Transaction = transaction;
                         cmd.Parameters.AddWithValue("@name", customer.Name);
-                        cmd.Parameters.AddWithValue("@email", customer.Contact.Email);
-                        cmd.Parameters.AddWithValue("@phone", customer.Contact.Phone);
-                        cmd.Parameters.AddWithValue("@address", customer.Contact.Address.ToAddressLine());
+                        cmd.Parameters.AddWithValue("@email", customer.ContactInfo.Email);
+                        cmd.Parameters.AddWithValue("@phone", customer.ContactInfo.Phone);
+                        cmd.Parameters.AddWithValue("@address", customer.ContactInfo.Address.ToAddressLine());
                         cmd.Parameters.AddWithValue("@status", 1);
-                        int id=(int)cmd.ExecuteScalar();
-                        customer.Id = id;   
+                        int id = (int)cmd.ExecuteScalar();
+                        //write members table
+                        SQL = "INSERT INTO member(name,birthday,customerid,status) VALUES(@name,@birthday,@customerid,@status) ";
+                        cmd.CommandText = SQL;
+
                         foreach (Member member in customer.GetMembers())
                         {
-                            sql = "INSERT INTO Member(customerId,name,birthday,status) VALUES (@customerid,@name,@birthday,@status)";
-                            cmd.CommandText = sql;
                             cmd.Parameters.Clear();
-                            cmd.Parameters.AddWithValue("@customerid", customer.Id);
                             cmd.Parameters.AddWithValue("@name", member.Name);
-                            cmd.Parameters.AddWithValue("@birthday", member.Birthday.ToDateTime(TimeOnly.MinValue));
+                            cmd.Parameters.AddWithValue("@birthday", member.BirthDay.ToDateTime(TimeOnly.MinValue));
+                            cmd.Parameters.AddWithValue("@customerid", id);
                             cmd.Parameters.AddWithValue("@status", 1);
                             cmd.ExecuteNonQuery();
                         }
-                        sqlTransaction.Commit();
+                        transaction.Commit();
                     }
-                    catch (Exception ex) { sqlTransaction.Rollback(); throw; }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                    }
                 }
             }
-            catch(Exception ex) { throw new CustomerRepositoryException("addcustomer", ex); }
+            catch (Exception ex)
+            {
+                throw new CustomerRepositoryException("AddCustomer", ex);
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Hotel.Domain.Model;
-using Hotel.Presentation.Customer.Model;
+using Hotel.Presentation.CustomerWPF.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +14,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Hotel.Presentation.Customer
+namespace Hotel.Presentation.CustomerWPF
 {
     /// <summary>
     /// Interaction logic for CustomerWindow.xaml
     /// </summary>
     public partial class CustomerWindow : Window
     {
-        //public CustomerUI CustomerUI { get; set; }
         public CustomerUI customerUI;
         private bool isUpdate;
         public CustomerWindow(bool isUpdate, CustomerUI customerUI)
@@ -38,10 +37,7 @@ namespace Hotel.Presentation.Customer
                 //CityTextBox.Text=customerUI.address
             }
         }
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             if (isUpdate)
@@ -53,16 +49,19 @@ namespace Hotel.Presentation.Customer
             }
             else
             {
-                
                 Customer c = new Customer(NameTextBox.Text, new ContactInfo(EmailTextBox.Text, PhoneTextBox.Text, new Address(CityTextBox.Text, ZipTextBox.Text, HouseNumberTextBox.Text, StreetTextBox.Text)));
-                //write customer
+              //  customermanager.Add()
                 c.Id = 100;
-                //TODO id from DB
+                //TODO Get Id from database
                 customerUI = new CustomerUI(c.Id, c.Name, c.ContactInfo.Email, c.ContactInfo.Phone, c.ContactInfo.Address.ToString(), c.GetMembers().Count);
             }
             DialogResult = true;
             Close();
         }
-    }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }
