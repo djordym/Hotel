@@ -31,11 +31,6 @@ namespace Hotel.Presentation.CustomerWPF
         {
             InitializeComponent();
             customerManager = new CustomerManager(RepositoryFactory.CustomerRepository);
-            GetUpToDateCustomerInfo();
-        }
-
-        private void GetUpToDateCustomerInfo()
-        {
             customersUIs = new ObservableCollection<CustomerUI>(customerManager.GetCustomersBy(null).Select(x => new CustomerUI(x.Id, x.Name, x.ContactInfo.Email, x.ContactInfo.Phone, x.ContactInfo.Address.ToString(), x.GetMembers().Count)));
             CustomerDataGrid.ItemsSource = customersUIs;
         }
@@ -49,33 +44,23 @@ namespace Hotel.Presentation.CustomerWPF
         {
             CustomerWindow w = new CustomerWindow(false, null);
             if (w.ShowDialog() == true)
-            {
-                GetUpToDateCustomerInfo();
-            }
-
+                customersUIs.Add(w.customerUI);
         }
 
         private void MenuItemDeleteCustomer_Click(object sender, RoutedEventArgs e)
         {
-            if (CustomerDataGrid.SelectedItem == null) MessageBox.Show("Please select a customer", "Delete");
-            else
-            {
-                //customerManager.DeleteCustomer()
-            }
+
         }
 
         private void MenuItemUpdateCustomer_Click(object sender, RoutedEventArgs e)
         {
-            if (CustomerDataGrid.SelectedItem == null) MessageBox.Show("Please select a customer", "Update");
+            if (CustomerDataGrid.SelectedItem == null) MessageBox.Show("Customer not selected", "Update");
             else
             {
                 CustomerWindow w = new CustomerWindow(true, (CustomerUI)CustomerDataGrid.SelectedItem);
-                if(w.ShowDialog() == true)
-                {
-                    GetUpToDateCustomerInfo();
-                }
-
+                w.ShowDialog();
             }
         }
+
     }
 }

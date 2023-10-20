@@ -40,7 +40,7 @@
         <TextBox Grid.Row="3" Grid.Column="3" Name="HouseNumberTextBox" Margin="5"/>
         <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Name="MemberDataGrid"/>
         <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Name="CancelButton" Content="Cancel" Click="CancelButton_Click"/>
-        <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="5" Name="AddButton" Content="Add" Click="AddButton_Click"/>
+        <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="5" Name="SaveButton" Content="Save" Click="SaveButton_Click"/>
     </Grid>
 </Window>
 

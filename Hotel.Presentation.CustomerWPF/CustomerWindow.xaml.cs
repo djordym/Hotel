@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,11 +35,19 @@ namespace Hotel.Presentation.CustomerWPF
                 NameTextBox.Text = customerUI.Name;
                 EmailTextBox.Text = customerUI.Email;
                 PhoneTextBox.Text = customerUI.Phone;
-                //CityTextBox.Text=customerUI.address
+                var match = Regex.Match(customerUI.Address, @"^(.*) \[(.*)\] - (.*) - (.*)$");
+                if (match.Success)
+                {
+
+                    CityTextBox.Text = match.Groups[1].Value;
+                    ZipTextBox.Text = match.Groups[2].Value;
+                    StreetTextBox.Text = match.Groups[3].Value;
+                    HouseNumberTextBox.Text = match.Groups[4].Value;
+                }
             }
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (isUpdate)
             {
