@@ -108,5 +108,42 @@ namespace Hotel.Persistence.Repositories
                 throw new CustomerRepositoryException("AddCustomer", ex);
             }
         }
+
+
+        public void UpdateCustomerById(int? id, string name, string email, string phone, string address)
+        {
+            try
+            {
+                string SQL = "UPDATE Customer SET name = @name, email = @email, phone = @phone, address = @address WHERE id = @id";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    conn.Open();
+                    SqlTransaction transaction = conn.BeginTransaction();
+                    try
+                    {
+                        // update customer table
+                        cmd.CommandText = SQL;
+                        cmd.Transaction = transaction;
+                        cmd.Parameters.AddWithValue("@id", id);
+                        cmd.Parameters.AddWithValue("@name", name);
+                        cmd.Parameters.AddWithValue("@email", email);
+                        cmd.Parameters.AddWithValue("@phone", phone);
+                        cmd.Parameters.AddWithValue("@address", address);
+                        cmd.ExecuteNonQuery();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw new CustomerRepositoryException("UpdateCustomerById", ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CustomerRepositoryException("UpdateCustomerById", ex);
+            }
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace Hotel.Domain.Interfaces
     {
         void AddCustomer(Customer customer);
         List<Customer> GetCustomersBy(string filter);
+        void UpdateCustomerById(int? id, string name, string email, string phone, string address);
     }
 }

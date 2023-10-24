@@ -29,5 +29,18 @@ namespace Hotel.Domain.Managers
                 throw new CustomerManagerException("GetCustomers", ex);
             }
         }
+
+        public void UpdateCustomerInformation(int? id, string name, string email, string phone, string address)
+        {
+            if(id == null)
+            {
+                throw new ArgumentNullException("id");
+            }
+            else
+            {
+                _customerRepository.UpdateCustomerById(id, name, email, phone, address);
+            }
+        }
+        
     }
 }

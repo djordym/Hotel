@@ -1,4 +1,5 @@
-﻿using Hotel.Domain.Model;
+﻿using Hotel.Domain.Managers;
+using Hotel.Domain.Model;
 using Hotel.Presentation.CustomerWPF.Model;
 using System;
 using System.Collections.Generic;
@@ -22,19 +23,23 @@ namespace Hotel.Presentation.CustomerWPF
     /// </summary>
     public partial class CustomerWindow : Window
     {
-        public CustomerUI customerUI;
-        private bool isUpdate;
-        public CustomerWindow(bool isUpdate, CustomerUI customerUI)
+        public CustomerUI _customerUI;
+        private bool _isUpdate;
+        private CustomerManager _customermanager;
+
+        public CustomerWindow(bool isUpdate, CustomerUI customerUI, CustomerManager customerManager)
         {
             InitializeComponent();
-            this.customerUI = customerUI;
-            this.isUpdate = isUpdate;
+            _customerUI = customerUI;
+            _isUpdate = isUpdate;
+            _customermanager = customerManager;
             if (customerUI != null)
             {
                 IdTextBox.Text = customerUI.Id.ToString();
                 NameTextBox.Text = customerUI.Name;
                 EmailTextBox.Text = customerUI.Email;
                 PhoneTextBox.Text = customerUI.Phone;
+
                 var match = Regex.Match(customerUI.Address, @"^(.*) \[(.*)\] - (.*) - (.*)$");
                 if (match.Success)
                 {
@@ -49,12 +54,16 @@ namespace Hotel.Presentation.CustomerWPF
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (isUpdate)
+            if (_isUpdate)
             {
-                customerUI.Name = NameTextBox.Text;
-                customerUI.Email = EmailTextBox.Text;
-                customerUI.Phone = PhoneTextBox.Text;
-                //TODO customermanager.Update()
+                _customerUI.Name = NameTextBox.Text;
+                _customerUI.Email = EmailTextBox.Text;
+                _customerUI.Phone = PhoneTextBox.Text;
+                Address address = new Address(CityTextBox.Text, StreetTextBox.Text, ZipTextBox.Text, HouseNumberTextBox.Text );
+                _customerUI.Address = address.ToString();
+
+                _customermanager.UpdateCustomerInformation(_customerUI.Id, _customerUI.Name, _customerUI.Email, _customerUI.Phone, address.ToAddressLine());
+                
             }
             else
             {
@@ -62,7 +71,7 @@ namespace Hotel.Presentation.CustomerWPF
               //  customermanager.Add()
                 c.Id = 100;
                 //TODO Get Id from database
-                customerUI = new CustomerUI(c.Id, c.Name, c.ContactInfo.Email, c.ContactInfo.Phone, c.ContactInfo.Address.ToString(), c.GetMembers().Count);
+                _customerUI = new CustomerUI(c.Id, c.Name, c.ContactInfo.Email, c.ContactInfo.Phone, c.ContactInfo.Address.ToString(), c.GetMembers().Count);
             }
             DialogResult = true;
             Close();
