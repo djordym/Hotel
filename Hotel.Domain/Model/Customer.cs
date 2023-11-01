@@ -9,13 +9,14 @@ namespace Hotel.Domain.Model
 {
     public class Customer
     {
-        private string _name;
-        public string Name { get { return _name; } set { if (string.IsNullOrWhiteSpace(value)) throw new CustomerException("name is empty"); _name = value; } }
         private int _id;
-        public int Id { get { return _id; } set { if (value <= 0) throw new CustomerException("invalid id"); _id = value; } }
+        private string _name;
         private ContactInfo _contactInfo;
-        public ContactInfo ContactInfo { get { return _contactInfo; } set { if (value == null) throw new CustomerException("contactinfo null"); _contactInfo = value; } }
         private List<Member> _members = new List<Member>();
+        public int Id { get { return _id; } set { if (value <= 0) throw new CustomerException("invalid id"); _id = value; } }
+        public string Name { get { return _name; } set { if (string.IsNullOrWhiteSpace(value)) throw new CustomerException("name is empty"); _name = value; } }
+        public ContactInfo ContactInfo { get { return _contactInfo; } set { if (value == null) throw new CustomerException("contactinfo null"); _contactInfo = value; } }
+
 
         public Customer(string name, int id, ContactInfo contactInfo)
         {
@@ -41,13 +42,13 @@ namespace Hotel.Domain.Model
             else
                 throw new CustomerException("addmember");
         }
-        public void RemoveMember(Member member)
-        {
-            if (_members.Contains(member))
-                _members.Remove(member);
-            else
-                throw new CustomerException("removemember");
-        }
+        //public void RemoveMember(Member member)
+        //{
+        //    if (_members.Contains(member))
+        //        _members.Remove(member);
+        //    else
+        //        throw new CustomerException("removemember");
+        //}
     }
 }
 

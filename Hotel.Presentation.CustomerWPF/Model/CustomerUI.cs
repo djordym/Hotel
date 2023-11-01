@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Hotel.Presentation.CustomerWPF.Model
 {
     public class CustomerUI : INotifyPropertyChanged
     {
-        public CustomerUI(int? id, string name, string email, string phone, string address, int nrOfMembers)
+        public CustomerUI(int? id, string name, string email, string phone, string address, int nrOfMembers, ObservableCollection<MemberUI> members)
         {
             this.id = id;
             this.name = name;
@@ -17,6 +18,11 @@ namespace Hotel.Presentation.CustomerWPF.Model
             this.phone = phone;
             this.address = address;
             NrOfMembers = nrOfMembers;
+            _members = members;
+        }
+
+        public CustomerUI()
+        {
         }
 
         private int? id;
@@ -31,6 +37,28 @@ namespace Hotel.Presentation.CustomerWPF.Model
         public string Address { get { return address; } set { address = value; OnPropertyChanged(); } }
         private int nrOfMembers;
         public int NrOfMembers { get { return nrOfMembers; } set { nrOfMembers = value; OnPropertyChanged(); } }
+        private ObservableCollection<MemberUI> _members;
+        public bool SetInactive { get; set; }
+        public ObservableCollection<MemberUI> Members
+        {
+            get
+            {
+                // create new collection for when new customerUI
+                if (_members == null)
+                {
+                    _members = new ObservableCollection<MemberUI>();
+                }
+
+                return _members;
+            }
+            private set
+            {
+                _members = value;
+                OnPropertyChanged();
+            }
+        }
+
+        
         private void OnPropertyChanged(string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

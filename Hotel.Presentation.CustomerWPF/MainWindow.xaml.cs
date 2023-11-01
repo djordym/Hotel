@@ -31,13 +31,13 @@ namespace Hotel.Presentation.CustomerWPF
         {
             InitializeComponent();
             _customerManager = new CustomerManager(RepositoryFactory.CustomerRepository);
-            customersUIs = new ObservableCollection<CustomerUI>(_customerManager.GetCustomersBy(null).Select(x => new CustomerUI(x.Id, x.Name, x.ContactInfo.Email, x.ContactInfo.Phone, x.ContactInfo.Address.ToString(), x.GetMembers().Count)));
+            customersUIs = new ObservableCollection<CustomerUI>(_customerManager.GetCustomersBy(null).Select(x => new CustomerUI(x.Id, x.Name, x.ContactInfo.Email, x.ContactInfo.Phone, x.ContactInfo.Address.ToString(), x.GetMembers().Count, new ObservableCollection<MemberUI>(x.GetMembers().Select(m => new MemberUI { Name = m.Name, Birthday = m.BirthDay })))));
             CustomerDataGrid.ItemsSource = customersUIs;
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            CustomerDataGrid.ItemsSource = new ObservableCollection<CustomerUI>(_customerManager.GetCustomersBy(SearchTextBox.Text).Select(x => new CustomerUI(x.Id, x.Name, x.ContactInfo.Email, x.ContactInfo.Phone, x.ContactInfo.Address.ToString(), x.GetMembers().Count)));
+            CustomerDataGrid.ItemsSource = new ObservableCollection<CustomerUI>(_customerManager.GetCustomersBy(SearchTextBox.Text).Select(x => new CustomerUI(x.Id, x.Name, x.ContactInfo.Email, x.ContactInfo.Phone, x.ContactInfo.Address.ToString(), x.GetMembers().Count, new ObservableCollection<MemberUI>(x.GetMembers().Select(m => new MemberUI { Name = m.Name, Birthday = m.BirthDay })))));
         }
 
         private void MenuItemAddCustomer_Click(object sender, RoutedEventArgs e)
@@ -49,7 +49,13 @@ namespace Hotel.Presentation.CustomerWPF
 
         private void MenuItemDeleteCustomer_Click(object sender, RoutedEventArgs e)
         {
+            CustomerUI customerUI= (CustomerUI)CustomerDataGrid.SelectedItem;
+            customersUIs.Remove(customerUI);
 
+            //_customerManager.RemoveCustomer();
+            
+
+            
         }
 
         private void MenuItemUpdateCustomer_Click(object sender, RoutedEventArgs e)

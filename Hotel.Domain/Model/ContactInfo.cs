@@ -18,10 +18,10 @@ namespace Hotel.Domain.Model
             Address = address;
         }
         private string _email;
-        public string Email { get { return _email; } set { if (string.IsNullOrEmpty(value) || !value.Contains('@')) throw new ContactInfoException("email is empty"); _email = value; } }
         private string _phone;
-        public string Phone { get { return _phone; } set { if (string.IsNullOrWhiteSpace(value)) throw new ContactInfoException("phone is empty"); _phone = value; } }
         private Address _address;
+        public string Email { get { return _email; } set { if (string.IsNullOrEmpty(value) || !value.Contains('@')) throw new ContactInfoException("email is empty"); _email = value; } }
+        public string Phone { get { return _phone; } set { if (string.IsNullOrWhiteSpace(value)) throw new ContactInfoException("phone is empty"); _phone = value; } }
         public Address Address { get { return _address; } set { if (value == null) throw new ContactInfoException("address is null"); _address = value; } }
     }
 

@@ -10,7 +10,8 @@ namespace Hotel.Domain.Interfaces
     public interface ICustomerRepository
     {
         void AddCustomer(Customer customer);
+        int GetCustomerIdByEmail(string email);
         List<Customer> GetCustomersBy(string filter);
-        void UpdateCustomerById(int? id, string name, string email, string phone, string address);
+        void UpdateCustomer(Customer c);
     }
 }

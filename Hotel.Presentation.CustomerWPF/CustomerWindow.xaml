@@ -30,7 +30,7 @@
         <Label Grid.Row="2" Grid.Column="2" Content="Street" Margin="5"/>
         <Label Grid.Row="3" Grid.Column="0" Content="Phone" Margin="5"/>
         <Label Grid.Row="3" Grid.Column="2" Content="House number" Margin="5"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Name="IdTextBox" Margin="5"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="IdTextBox" Margin="5" IsReadOnly="True"/>
         <TextBox Grid.Row="0" Grid.Column="3" Name="CityTextBox" Margin="5"/>
         <TextBox Grid.Row="1" Grid.Column="1" Name="NameTextBox" Margin="5"/>
         <TextBox Grid.Row="1" Grid.Column="3" Name="ZipTextBox" Margin="5"/>
@@ -38,7 +38,14 @@
         <TextBox Grid.Row="2" Grid.Column="3" Name="StreetTextBox" Margin="5"/>
         <TextBox Grid.Row="3" Grid.Column="1" Name="PhoneTextBox" Margin="5"/>
         <TextBox Grid.Row="3" Grid.Column="3" Name="HouseNumberTextBox" Margin="5"/>
-        <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Name="MemberDataGrid"/>
+        <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Name="MemberDataGrid">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add Member" Click="MenuItemAddMember_Click"></MenuItem>
+                    <MenuItem Header="Delete Member" Click="MenuItemDeleteMember_Click"></MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
         <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Name="CancelButton" Content="Cancel" Click="CancelButton_Click"/>
         <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="5" Name="SaveButton" Content="Save" Click="SaveButton_Click"/>
     </Grid>

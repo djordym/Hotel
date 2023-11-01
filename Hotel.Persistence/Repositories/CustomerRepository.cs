@@ -110,11 +110,10 @@ namespace Hotel.Persistence.Repositories
         }
 
 
-        public void UpdateCustomerById(int? id, string name, string email, string phone, string address)
+        public void UpdateCustomer(Customer c)
         {
             try
             {
-                string SQL = "UPDATE Customer SET name = @name, email = @email, phone = @phone, address = @address WHERE id = @id";
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
@@ -123,14 +122,39 @@ namespace Hotel.Persistence.Repositories
                     try
                     {
                         // update customer table
+                        string SQL = "UPDATE Customer SET name = @name, email = @email, phone = @phone, address = @address WHERE id = @id";
                         cmd.CommandText = SQL;
                         cmd.Transaction = transaction;
-                        cmd.Parameters.AddWithValue("@id", id);
-                        cmd.Parameters.AddWithValue("@name", name);
-                        cmd.Parameters.AddWithValue("@email", email);
-                        cmd.Parameters.AddWithValue("@phone", phone);
-                        cmd.Parameters.AddWithValue("@address", address);
+                        cmd.Parameters.AddWithValue("@id", c.Id);
+                        cmd.Parameters.AddWithValue("@name", c.Name);
+                        cmd.Parameters.AddWithValue("@email", c.ContactInfo.Email);
+                        cmd.Parameters.AddWithValue("@phone", c.ContactInfo.Phone);
+                        cmd.Parameters.AddWithValue("@address", c.ContactInfo.Address.ToAddressLine());
                         cmd.ExecuteNonQuery();
+
+                        // update members table
+                        SQL = "SELECT COUNT(*) FROM member WHERE customerid = @customerid AND name = @name AND birthday = @birthday";
+                        cmd.CommandText = SQL;
+
+                        foreach (Member member in c.GetMembers())
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.AddWithValue("@name", member.Name);
+                            cmd.Parameters.AddWithValue("@birthday", member.BirthDay.ToDateTime(TimeOnly.MinValue));
+                            cmd.Parameters.AddWithValue("@customerid", c.Id);
+                            int count = (int)cmd.ExecuteScalar();
+
+                            if (count == 0)
+                            {
+                                string insertSQL = "INSERT INTO member(name,birthday,customerid,status) VALUES(@name,@birthday,@customerid,@status) ";
+                                cmd.CommandText = insertSQL;
+                                cmd.Parameters.AddWithValue("@status", 1);
+                                cmd.ExecuteNonQuery();
+
+                                cmd.CommandText = SQL; // reset back to SELECT command text
+                            }
+                        }
+
                         transaction.Commit();
                     }
                     catch (Exception ex)
@@ -143,6 +167,37 @@ namespace Hotel.Persistence.Repositories
             catch (Exception ex)
             {
                 throw new CustomerRepositoryException("UpdateCustomerById", ex);
+            }
+        }
+
+        public int GetCustomerIdByEmail(string email)
+        {
+            try
+            {
+                string sql = "Select id from customer where email = @email";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    conn.Open();
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        return reader.GetInt32(0);
+                    } else
+                    {
+                        throw new CustomerRepositoryException("Customer not found");
+                    }
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CustomerRepositoryException("GetCustomerby email", ex);
             }
         }
     }
