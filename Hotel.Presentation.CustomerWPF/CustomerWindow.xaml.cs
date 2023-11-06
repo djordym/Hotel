@@ -93,47 +93,7 @@ namespace Hotel.Presentation.CustomerWPF
             Close();
 
 
-            //if (_isUpdate) 
-            //{
-            //    _customerUI.Name = NameTextBox.Text;
-            //    _customerUI.Email = EmailTextBox.Text;
-            //    _customerUI.Phone = PhoneTextBox.Text;
-            //    Address address = new Address(CityTextBox.Text, StreetTextBox.Text, ZipTextBox.Text, HouseNumberTextBox.Text );
-            //    _customerUI.Address = address.ToString();
-
-            //    Customer c = new Customer(NameTextBox.Text, int.Parse(IdTextBox.Text), new ContactInfo(EmailTextBox.Text, PhoneTextBox.Text, address));
-            //    foreach (MemberUI mUI in _customerUI.Members)
-            //    {
-            //        Member m = new Member(mUI.Name, mUI.Birthday);
-            //        c.AddMember(m);
-            //    }
-            //    _customermanager.UpdateCustomer(c);
-
-            //}
-            //else
-            //{
-
-            //    Customer c = new Customer(NameTextBox.Text, new ContactInfo(EmailTextBox.Text, PhoneTextBox.Text, new Address(CityTextBox.Text, ZipTextBox.Text, HouseNumberTextBox.Text, StreetTextBox.Text)));
-            //    foreach(MemberUI mUI in _customerUI.Members)
-            //    {
-            //        Member m = new Member(mUI.Name, mUI.Birthday);
-            //        c.AddMember(m);
-            //    }
-
-            //    _customermanager.AddCustomer(c);
-
-            //    c.Id = _customermanager.GetCustomerIdByEmail(EmailTextBox.Text);
-
-            //    _customerUI.Id = c.Id;
-            //    _customerUI.Name = c.Name;
-            //    _customerUI.Email = c.ContactInfo.Email;
-            //    _customerUI.Phone = c.ContactInfo.Phone;
-            //    _customerUI.Address = c.ContactInfo.Address.ToString();
-            //    _customerUI.NrOfMembers = c.GetMembers().Count;
-
-            //}
-            //DialogResult = true;
-            //Close();
+            
         }
 
         void UpdateCustomerUI(string name, string email, string phone, Address address)
@@ -173,7 +133,9 @@ namespace Hotel.Presentation.CustomerWPF
 
         private void MenuItemDeleteMember_Click(Object sender, RoutedEventArgs e)
         {
-
+            MemberUI memberUIToDelete = (MemberUI)MemberDataGrid.SelectedItem;
+            _customerUI.Members.Remove(memberUIToDelete);
+            _customermanager.RemoveMember(_customerUI.Id, memberUIToDelete.Name, memberUIToDelete.Birthday);
         }
     }
 }

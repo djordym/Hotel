@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace Hotel.Domain.Model
 {
-    internal class Activity
+    public class Activity
     {
+        public int Id { get; set; }
+        public DateTime Fixture {  get; set; }
+
+        public int NrOfPlaces { get; set; }
+        public List<ActivityDescription> Description { get; set; }
+        public List<ActivityPriceInfo> PriceInfo { get; set;}
     }
 }

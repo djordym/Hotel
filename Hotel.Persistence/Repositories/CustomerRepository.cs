@@ -4,6 +4,7 @@ using Hotel.Persistence.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -198,6 +199,75 @@ namespace Hotel.Persistence.Repositories
             catch (Exception ex)
             {
                 throw new CustomerRepositoryException("GetCustomerby email", ex);
+            }
+        }
+
+        public void RemoveCustomerById(int? id)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    conn.Open();
+                    SqlTransaction transaction = conn.BeginTransaction();
+                    try
+                    {
+                        // update customer status to 0 (inactive)
+                        string SQL = "UPDATE Customer SET Status = 0 WHERE id = @id";
+                        cmd.CommandText = SQL;
+                        cmd.Transaction = transaction;
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        cmd.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw new CustomerRepositoryException("RemoveCustomerById", ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CustomerRepositoryException("RemoveCustomerById", ex);
+            }
+        }
+
+        public void RemoveMember(int? customerId, string memberName, DateOnly memberBirthday)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    conn.Open();
+                    SqlTransaction transaction = conn.BeginTransaction();
+                    try
+                    {
+                        //update member status to 0 (inactive)
+                        string SQL = "UPDATE Member SET status = 0 WHERE customerId = @customerId AND name = @name AND birthday = @birthday;";
+                        cmd.CommandText = SQL;
+                        cmd.Transaction = transaction;
+                        cmd.Parameters.AddWithValue("@customerId", customerId);
+                        cmd.Parameters.AddWithValue("@name", memberName);
+                        cmd.Parameters.AddWithValue("@birthday", memberBirthday.ToDateTime(TimeOnly.MinValue));
+
+                        cmd.ExecuteNonQuery();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw new Exception("removemember", ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("removemember", ex);
             }
         }
     }

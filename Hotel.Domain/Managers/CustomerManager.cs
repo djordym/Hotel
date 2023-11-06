@@ -52,6 +52,30 @@ namespace Hotel.Domain.Managers
             }
         }
 
+        public void RemoveCustomerById(int? id)
+        {
+            try
+            {
+                _customerRepository.RemoveCustomerById(id);
+            }
+            catch(Exception ex)
+            {
+                throw new CustomerManagerException("removecustomer", ex);
+            }
+        }
+
+        public void RemoveMember(int? customerId, string memberName, DateOnly memberBirthday)
+        {
+            try
+            {
+                _customerRepository.RemoveMember(customerId, memberName, memberBirthday);
+            }
+            catch(Exception ex)
+            {
+                throw new CustomerManagerException("removemember", ex);
+            }
+        }
+
         public void UpdateCustomer(Customer c)
         {
             try

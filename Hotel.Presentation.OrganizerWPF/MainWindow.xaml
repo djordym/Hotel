@@ -7,6 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Email" Margin="5" FontWeight="Bold"/>
+            <TextBox x:Name="EmailTextBox" Width="200" Margin="5"/>
 
+            <Button x:Name="LoginButton" Click="LoginButton_Click" Width="200" Content="Login" Margin="5"/>
+        </StackPanel>
     </Grid>
 </Window>

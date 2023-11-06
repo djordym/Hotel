@@ -51,8 +51,8 @@ namespace Hotel.Presentation.CustomerWPF
         {
             CustomerUI customerUI= (CustomerUI)CustomerDataGrid.SelectedItem;
             customersUIs.Remove(customerUI);
-
-            //_customerManager.RemoveCustomer();
+            
+            _customerManager.RemoveCustomerById(customerUI.Id);
             
 
             

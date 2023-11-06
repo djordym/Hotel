@@ -38,7 +38,6 @@ namespace Hotel.Presentation.CustomerWPF.Model
         private int nrOfMembers;
         public int NrOfMembers { get { return nrOfMembers; } set { nrOfMembers = value; OnPropertyChanged(); } }
         private ObservableCollection<MemberUI> _members;
-        public bool SetInactive { get; set; }
         public ObservableCollection<MemberUI> Members
         {
             get

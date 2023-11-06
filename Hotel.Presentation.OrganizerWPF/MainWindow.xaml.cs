@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Hotel.Domain.Managers;
+using Hotel.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,16 @@ namespace Hotel.Presentation.OrganizerWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        private OrganizerManager _organizerManager;
         public MainWindow()
         {
             InitializeComponent();
+            _organizerManager = new OrganizerManager(RepositoryFactory.OrganizerRepository);
+        }
+
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            _organizerManager.GetOrganizerByEmail(EmailTextBox.Text);
         }
     }
 }

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Hotel.Domain.Model
 {
-    internal class ActivityPriceInfo
+    public class ActivityPriceInfo
     {
+        public int PriceAdult { get; set; }
+        public int PriceChild { get; set; }
+        public int DiscountAdult { get; set; }
+        public int DiscountChild { get; set; }
     }
 }
