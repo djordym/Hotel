@@ -19,7 +19,7 @@ namespace Hotel.Domain.Model
 
         public ContactInfo ContactInfo { get { return _contactInfo; } set { if (value == null) throw new OrganizerException("contactinfo null"); _contactInfo = value; } }
 
-        public List<Activity> Activities { get; set; }
+        public List<Activity> Activities { get; set; } = new List<Activity>();
 
     }
 }

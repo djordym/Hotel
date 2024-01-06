@@ -15,5 +15,6 @@ namespace Hotel.Domain.Interfaces
         void RemoveCustomerById(int? id);
         void RemoveMember(int? customerId, string memberName, DateOnly memberBirthday);
         void UpdateCustomer(Customer c);
+        Customer GetCustomerByEmail(string text);
     }
 }

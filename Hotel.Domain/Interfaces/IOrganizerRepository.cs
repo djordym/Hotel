@@ -9,6 +9,8 @@ namespace Hotel.Domain.Interfaces
 {
     public interface IOrganizerRepository
     {
+        void AddActivity(Activity domainActivity);
         Organizer GetOrganizerByEmail(string email);
+        void RemoveActivityById(int id);
     }
 }

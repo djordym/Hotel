@@ -13,6 +13,7 @@ namespace Hotel.Domain.Model
         private string _name;
         private ContactInfo _contactInfo;
         private List<Member> _members = new List<Member>();
+        public List<Member> Members { get { return _members; } set { _members = value; } }
         public int Id { get { return _id; } set { if (value <= 0) throw new CustomerException("invalid id"); _id = value; } }
         public string Name { get { return _name; } set { if (string.IsNullOrWhiteSpace(value)) throw new CustomerException("name is empty"); _name = value; } }
         public ContactInfo ContactInfo { get { return _contactInfo; } set { if (value == null) throw new CustomerException("contactinfo null"); _contactInfo = value; } }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hotel.Domain.Exceptions
 {
-    internal class OrganizerException : Exception
+    public class OrganizerException : Exception
     {
         public OrganizerException(string? message) : base(message)
         {

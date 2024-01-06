@@ -1,6 +1,6 @@
-﻿using Hotel.Domain.Interfaces;
+﻿using Hotel.Domain.Exceptions;
+using Hotel.Domain.Interfaces;
 using Hotel.Domain.Model;
-using Hotel.Persistence.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -28,11 +28,11 @@ namespace Hotel.Persistence.Repositories
                 string sql;
                 if (string.IsNullOrEmpty(filter))
                 {
-                    sql = "select t1.id,t1.email,t1.name customername,t1.address,t1.phone,t2.name membername,t2.birthday\r\nfrom customer t1 \r\nleft join (select * from member where status=1) t2 on t1.id=t2.customerId\r\nwhere t1.status=1";
+                    sql = "select t1.id,t1.email,t1.name customername,t1.address,t1.phone,t2.id memberid, t2.name membername,t2.birthday\r\nfrom customer t1 \r\nleft join (select * from member where status=1) t2 on t1.id=t2.customerId\r\nwhere t1.status=1";
                 }
                 else
                 {
-                    sql = "select t1.id,t1.email,t1.name customername,t1.address,t1.phone,t2.name membername,t2.birthday\r\nfrom customer t1 \r\nleft join (select * from member where status=1) t2 on t1.id=t2.customerId\r\nwhere t1.status=1 and (t1.id like @filter or t1.name like @filter or t1.email like @filter)";
+                    sql = "select t1.id,t1.email,t1.name customername,t1.address,t1.phone,t2.id memberid,t2.name membername,t2.birthday\r\nfrom customer t1 \r\nleft join (select * from member where status=1) t2 on t1.id=t2.customerId\r\nwhere t1.status=1 and (t1.id like @filter or t1.name like @filter or t1.email like @filter)";
                 }
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 using (SqlCommand cmd = conn.CreateCommand())
@@ -51,7 +51,7 @@ namespace Hotel.Persistence.Repositories
                             }
                             if (!reader.IsDBNull(reader.GetOrdinal("membername")))
                             {
-                                customers[id].AddMember(new Member((string)reader["membername"], DateOnly.FromDateTime((DateTime)reader["birthday"])));
+                                customers[id].AddMember(new Member((int)reader["id"], (string)reader["membername"], DateOnly.FromDateTime((DateTime)reader["birthday"])));
                             }
                         }
                     return customers.Values.ToList();
@@ -59,7 +59,7 @@ namespace Hotel.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                throw new CustomerRepositoryException("GetCustomer", ex);
+                throw new CustomerException("GetCustomer out of database failed", ex);
             }
         }
         public void AddCustomer(Customer customer)
@@ -106,7 +106,7 @@ namespace Hotel.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                throw new CustomerRepositoryException("AddCustomer", ex);
+                throw new CustomerException("AddCustomer out of database", ex);
             }
         }
 
@@ -161,13 +161,13 @@ namespace Hotel.Persistence.Repositories
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        throw new CustomerRepositoryException("UpdateCustomerById", ex);
+                        throw new CustomerException("UpdateCustomerById", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new CustomerRepositoryException("UpdateCustomerById", ex);
+                throw new CustomerException("UpdateCustomerById", ex);
             }
         }
 
@@ -189,16 +189,17 @@ namespace Hotel.Persistence.Repositories
                     if (reader.Read())
                     {
                         return reader.GetInt32(0);
-                    } else
-                    {
-                        throw new CustomerRepositoryException("Customer not found");
                     }
-                    
+                    else
+                    {
+                        throw new CustomerException("Customer not found");
+                    }
+
                 }
             }
             catch (Exception ex)
             {
-                throw new CustomerRepositoryException("GetCustomerby email", ex);
+                throw new CustomerException("GetCustomerby email", ex);
             }
         }
 
@@ -226,13 +227,13 @@ namespace Hotel.Persistence.Repositories
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        throw new CustomerRepositoryException("RemoveCustomerById", ex);
+                        throw new CustomerException("RemoveCustomerById", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new CustomerRepositoryException("RemoveCustomerById", ex);
+                throw new CustomerException("RemoveCustomerById", ex);
             }
         }
 
@@ -268,6 +269,71 @@ namespace Hotel.Persistence.Repositories
             catch (Exception ex)
             {
                 throw new Exception("removemember", ex);
+            }
+        }
+
+        public Customer GetCustomerByEmail(string email)
+        {
+            try
+            {
+                Customer customer = null;
+                string sql = @"SELECT t1.id,
+                              t1.email,
+                              t1.name AS customername,
+                              t1.address,
+                              t1.phone,
+                              t2.id AS memberid,
+                              t2.name AS membername,
+                              t2.birthday
+                       FROM Customer t1
+                       LEFT JOIN (SELECT * FROM member WHERE status=1) t2 ON t1.id=t2.customerId
+                       WHERE t1.status=1 AND t1.email = @email";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    conn.Open();
+                    cmd.CommandText = sql;
+                    cmd.Parameters.AddWithValue("@email", email);
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            int id = Convert.ToInt32(reader["id"]);
+                            if (customer == null) // Create customer object
+                            {
+                                customer = new Customer(
+                                    (string)reader["customername"],
+                                    id,
+                                    new ContactInfo(
+                                        (string)reader["email"],
+                                        (string)reader["phone"],
+                                        new Address((string)reader["address"])
+                                    )
+                                );
+                            }
+                            if (!reader.IsDBNull(reader.GetOrdinal("membername")))
+                            {
+                                customer.AddMember(new Member(
+                                    (string)reader["membername"],
+                                    DateOnly.FromDateTime((DateTime)reader["birthday"])
+                                ));
+                            }
+                        }
+                    }
+                }
+                if (customer == null)
+                    throw new CustomerException("Customer not found");
+                return customer;
+            }
+            catch (CustomerException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new CustomerException("GetCustomer by email out of database failed", ex);
             }
         }
     }

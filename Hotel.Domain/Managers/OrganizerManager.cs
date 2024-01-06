@@ -11,20 +11,45 @@ namespace Hotel.Domain.Managers
 {
     public class OrganizerManager
     {
-        private IOrganizerRepository _organizerRepository;
+        private readonly IOrganizerRepository _organizerRepository;
         public OrganizerManager(IOrganizerRepository organizerRepository)
         {
             _organizerRepository = organizerRepository;
+        }
+
+        public void AddActivity(Activity domainActivity)
+        {
+            try
+            {
+                _organizerRepository.AddActivity(domainActivity);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public Organizer GetOrganizerByEmail(string email)
         {
             try
             {
-                _organizerRepository.GetOrganizerByEmail(email);
-            }catch (Exception ex)
+                return _organizerRepository.GetOrganizerByEmail(email);
+            }
+            catch (Exception ex)
             {
-                OrganizerException("getorganbyemail", ex);
+                throw;
+            }
+        }
+
+        public void RemoveActivityById(int id)
+        {
+            try
+            {
+                _organizerRepository.RemoveActivityById(id);
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
     }

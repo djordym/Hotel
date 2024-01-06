@@ -4,11 +4,20 @@ namespace Hotel.Domain.Model
 {
     public class Member
     {
+        public Member(int id, string name, DateOnly birthDay)
+        {
+            Id = id;
+            Name = name;
+            BirthDay = birthDay;
+        }
+
         public Member(string name, DateOnly birthDay)
         {
             Name = name;
             BirthDay = birthDay;
         }
+
+        public int Id { get; set; }
         private string _name;
         private DateOnly _birthDay;
         public string Name { get { return _name; } set { if (string.IsNullOrWhiteSpace(value)) throw new MemberException("name is empty"); _name = value; } }

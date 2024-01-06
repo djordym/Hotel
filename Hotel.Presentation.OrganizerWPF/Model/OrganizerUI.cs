@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 
 namespace Hotel.Presentation.OrganizerWPF.Model
 {
-    class OrganizerUI
+    public class OrganizerUI
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        //public string Email { get; set; }
-        //public string Phone { get; set; }
-        //public string Address { get; set; }
-        public ObservableCollection<ActivityUI> ActivityUIs { get; set; }
-
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string City { get; set; }
+        public string PostalCode { get; set; }
+        public string Street { get; set; }
+        public string HouseNumber { get; set; }
+        public ObservableCollection<ActivityUI> Activities { get; set; }
     }
 }

@@ -8,5 +8,7 @@ namespace Hotel.Util
     {
         public static ICustomerRepository CustomerRepository { get { return new CustomerRepository(ConfigurationManager.ConnectionStrings["HotelDB"].ConnectionString); } }
         public static IOrganizerRepository OrganizerRepository { get { return new OrganizerRepository(ConfigurationManager.ConnectionStrings["HotelDB"].ConnectionString); } }
+
+        public static IRegistrationRepository RegistrationRepository { get { return new RegistrationRepository(ConfigurationManager.ConnectionStrings["HotelDB"].ConnectionString); } }
     }
 }

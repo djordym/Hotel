@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hotel.Presentation.OrganizerWPF.Model
+namespace UserApp.Model
 {
     public class ActivityUI
     {
         public int Id { get; set; }
         public int OrganizerId { get; set; }
         public string Name { get; set; }
-        public DateTime Fixture {  get; set; }
+        public DateTime Fixture { get; set; }
         public int DescriptionId { get; set; }
         public int NrOfPlaces { get; set; }
         public int Duration { get; set; }

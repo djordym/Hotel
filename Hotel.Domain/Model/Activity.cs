@@ -8,11 +8,39 @@ namespace Hotel.Domain.Model
 {
     public class Activity
     {
-        public int Id { get; set; }
-        public DateTime Fixture {  get; set; }
+        public Activity()
+        {
+        }
 
-        public int NrOfPlaces { get; set; }
-        public List<ActivityDescription> Description { get; set; }
-        public List<ActivityPriceInfo> PriceInfo { get; set;}
+        public Activity(int id, DateTime fixture, int nrOfPlaces, ActivityDescription description, ActivityPriceInfo priceInfo, int organizerId)
+        {
+            Id = id;
+            Fixture = fixture;
+            NrOfPlaces = nrOfPlaces;
+            Description = description;
+            PriceInfo = priceInfo;
+            OrganizerId = organizerId;
+
+        }
+
+
+        public int Id { get; set; }
+        public int OrganizerId { get; set; }
+        //should be in future
+        private DateTime _fixture;
+        public DateTime Fixture
+        {
+            get => _fixture;
+            set => _fixture = value > DateTime.Now ? value : throw new ArgumentException("Fixture must be in future");
+        }
+        //should be positive    
+        private int _nrOfPlaces;
+        public int NrOfPlaces {
+            get => _nrOfPlaces;
+            set => _nrOfPlaces = value > 0 ? value : throw new ArgumentException("NrOfPlaces must be positive");
+        }
+
+        public ActivityDescription Description { get; set; }
+        public ActivityPriceInfo PriceInfo { get; set; }
     }
 }
